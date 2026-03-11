@@ -1,0 +1,46 @@
+services:
+  nosql:
+    image: mongo:8
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: etl_user
+      MONGO_INITDB_ROOT_PASSWORD: etl_password
+      MONGO_INITDB_DATABASE: etl_database
+    volumes:
+      - mongo_data:/data/db
+      - ./nosql/init.js:/docker-entrypoint-initdb.d/init.js
+    ports:
+      - "27017:27017"
+  
+  sql:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: etl_user
+      POSTGRES_PASSWORD: etl_password
+      POSTGRES_DB: etl_database
+    volumes:
+      - pgdata:/var/lib/postgresql
+      - ./sql/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    ports:
+      - 5432:5432
+
+  airflow:
+    image: apache/airflow:3.1.6
+    entrypoint: /bin/bash
+    command: /start.sh
+    environment:
+      AIRFLOW__CORE__AUTH_MANAGER: "airflow.providers.fab.auth_manager.fab_auth_manager.FabAuthManager"
+      AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+    depends_on:
+      - sql
+      - nosql
+    volumes:
+    - ./airflow/dags:/opt/airflow/dags
+    - ./airflow/start.sh:/start.sh
+    - airflow_data:/opt/airflow
+    ports:
+    - "8080:8080"
+
+volumes:
+  airflow_data:
+  mongo_data:
+  pgdata:
