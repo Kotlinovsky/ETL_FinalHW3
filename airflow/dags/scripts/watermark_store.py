@@ -53,7 +53,7 @@ class WatermarkStore:
 
     def set_watermark(self, pipeline_name: str, value):
         path = self._watermark_path(pipeline_name)
-        path.write_text(value.strftime('%s'))
+        path.write_text(datetime.fromisoformat(value).strftime('%s'))
 
     def set_manifest(self, pipeline_name: str, data: dict):
         # Записываем манифест с чанками как JSON.
