@@ -87,7 +87,7 @@ def transform_chunk_task(pipeline_name: str, chunk_idx: int):
 
             # Произведем маппинг посещенных пользователем страниц.
             # Произведем маппинг действий, произведенных в ходе сессии.
-            for page in row.get("pages", []):
+            for page in row.get("pages_visited", []):
                 sessions_pages_rows.append([row["session_id"], page])
             for action in row.get("actions", []):
                 sessions_actions_rows.append([row["session_id"], action])
@@ -181,7 +181,7 @@ def load_chunk_task(pipeline_name: str, chunk_idx: int):
     payload = store.get_transformed_chunk(pipeline_name, chunk_idx)
 
     if pipeline_name == "sessions":
-        saver.save_sessions(payload["sessions_rows"], payload["sessions_pages_rows"], payload["sessions_pages_rows"])
+        saver.save_sessions(payload["sessions_rows"], payload["sessions_pages_rows"], payload["sessions_actions_rows"])
     elif pipeline_name == "event_logs":
         saver.save_event_logs(payload["event_logs_rows"])
     elif pipeline_name == "support_tickets":

@@ -48,7 +48,7 @@ class MongoExtractor:
         try:
             # Найдем документ с максимальным значением водянного знака.
             documents = list(collection.find(query, {watermark_field: 1, "_id": 0})
-                             .sort("watermark_field", -1)
+                             .sort(watermark_field, -1)
                              .limit(1))
 
             # Если не удалось получить документы, то вернем None.
